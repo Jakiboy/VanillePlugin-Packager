@@ -1,0 +1,23 @@
+{
+  "name": "jakiboy/vanilleplugin-packager",
+  "description": "Wrap VanillePlugin Dependency as a package under prefixed namespace",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Jihad Sinnaour",
+      "email": "mail@jihadsinnaour.com",
+      "role": "Founder"
+    },
+    {
+      "name": "Softgine",
+      "email": "e-mailing@soft-gine.com",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": "^7.4|^8.0",
+  },
+  "bin": [
+    "bin/vanilleplugin"
+  ]
+}
