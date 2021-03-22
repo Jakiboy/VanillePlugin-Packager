@@ -6,3 +6,9 @@ Wrap VanillePlugin Dependency as a package under prefixed namespace
 ```
 composer global require --dev jakiboy/vanilleplugin-packager
 ```
+
+## Use :
+
+```
+vanilleplugin -generate [prefix]
+```
