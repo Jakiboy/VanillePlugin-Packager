@@ -3,7 +3,7 @@
 /**
  * @author    : JIHAD SINNAOUR
  * @package   : VanillePlugin Packager
- * @version   : 0.1.0
+ * @version   : 0.2.0
  * @copyright : (c) 2021 JIHAD SINNAOUR <mail@jihadsinnaour.com>
  * @link      : https://github.com/Jakiboy/VanillePlugin-Packager
  * @license   : MIT
@@ -58,7 +58,7 @@ function prefixNamespace($content, $prefix = ''){
 
 // Prefix use
 function prefixUse($content, $prefix = ''){
-	$regex = '/(?i)use\s+VanillePlugin/';
+	$regex = '/(?!(?i)use\s+VanillePluginConfig)(?i)use\s+VanillePlugin/';
     return preg_replace($regex, "use {$prefix}VanillePlugin", $content);
 }
 
