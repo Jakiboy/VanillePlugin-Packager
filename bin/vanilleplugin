@@ -3,7 +3,7 @@
 /**
  * @author    : JIHAD SINNAOUR
  * @package   : VanillePlugin Packager
- * @version   : 0.2.0
+ * @version   : 0.2.1
  * @copyright : (c) 2021 JIHAD SINNAOUR <mail@jihadsinnaour.com>
  * @link      : https://github.com/Jakiboy/VanillePlugin-Packager
  * @license   : MIT
@@ -34,6 +34,7 @@ function generate($prefix = ''){
 	$dir = getcwd();
 	$replacements = [
 		"{$dir}{$sep}core{$sep}vendor{$sep}jakiboy{$sep}vanilleplugin{$sep}src",
+		"{$dir}{$sep}core{$sep}vendor{$sep}jakiboy{$sep}vanilleplugin-task{$sep}src",
 		"{$dir}{$sep}core{$sep}vendor{$sep}composer",
 		"{$dir}{$sep}core{$sep}system"
 	];
