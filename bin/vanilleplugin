@@ -3,126 +3,860 @@
 /**
  * @author    : JIHAD SINNAOUR
  * @package   : VanillePlugin Packager
- * @version   : 0.2.1
- * @copyright : (c) 2021 JIHAD SINNAOUR <mail@jihadsinnaour.com>
+ * @version   : 0.3.0
+ * @copyright : (c) 2022 Jihad Sinnaour <mail@jihadsinnaour.com>
  * @link      : https://github.com/Jakiboy/VanillePlugin-Packager
  * @license   : MIT
+ * @todo      : Add phpunit/phpunit.
+ * @todo      : Use symfony/console.
+ * @todo      : Use phar.
+ * 
+ * Warning: Use this software at your own risk.
  */
 
 declare(strict_types=1);
 
-// Check CLI
-if (php_sapi_name() !== 'cli') exit();
+// Script config
+set_time_limit(120);
+error_reporting(-1);
+ini_set('memory_limit','256M');
 
-// Get Args
-$option = parse($argv);
+/**
+ * Check PHP SAPI & Version.
+ */
+if ( (php_sapi_name() !== 'cli') 
+  || (PHP_VERSION_ID < 70200) ) exit();
 
-// Prepare command-line
-if ( isset($option['-generate']) ) {
-	if ( $option['-generate'] === true ) {
-		generate();
-	} else {
-		generate($option['-generate']);
+define('PACKAGER_NAME','VanillePlugin Packager');
+define('PACKAGER_DESC','Composer Namespaces Prefixer for WordPress Plugins');
+define('PACKAGER_SYNOPSIS','Resolve dependencies versions conflicts of WordPress plugins built using Composer.');
+define('PACKAGER_VERSION','0.3.0');
+define('PACKAGER_AUTHOR','Jihad Sinnaour');
+define('PACKAGER_LINK','https://jakiboy.github.io/VanillePlugin-Packager/');
+
+/**
+ * Parse command-line options.
+ */
+$options = vanillePluginPackagerParseOptions($argv);
+
+/**
+ * Prepare command-line.
+ */
+if ( isset($options['reg']) && $options['reg'] === true ) {
+
+	// Process VanillePlugin
+	if ( $options['prefix'] === true ) {
+		// With random prefix
+		$prefix = '';
+
+	} elseif ( is_string($options['prefix']) ) {
+		// With prefix
+		$prefix = $options['prefix'];
 	}
-} else {
-	showHelp();
+
+	// Init VanillePlugin
+	vanillePluginPackagerInit([
+		'dep'    => 'vanilleplugin',
+		'prefix' => $prefix
+	]);
+
+} elseif ( isset($options['regd']) && $options['regd'] === true ) {
+
+	// Process dependency
+	if ( $options['prefix'] === true ) {
+		// With random prefix
+		$prefix = '';
+
+	} elseif ( is_string($options['prefix']) ) {
+		// With prefix
+		$prefix = $options['prefix'];
+	}
+
+	// Init dependency
+	vanillePluginPackagerInit([
+		'dep'    => $options['dep'],
+		'lib'    => $options['lib'],
+		'prefix' => $prefix
+	]);
+
+} elseif ( isset($options['test']) && $options['test'] === true ) {
+	vanillePluginPackagerTestPrefix($options['prefix']);
+
+} elseif ( isset($options['version']) && $options['version'] === true ) {
+	vanillePluginPackagerDisplayVersion();
+
+} elseif ( isset($options['v']) && $options['v'] === true ) {
+	vanillePluginPackagerDisplayVersion(); // Version alias
+
+} elseif ( isset($options['help']) && $options['help'] === true ) {
+	vanillePluginPackagerDisplayHelp();
+
+} elseif ( isset($options['h']) && $options['h'] === true ) {
+	vanillePluginPackagerDisplayHelp(); // Help alias
 }
 
-// Generate prefix
-function generate($prefix = ''){
+vanillePluginPackagerDisplayError(0);
+
+/**
+ * Init packager,
+ * Accept options: dep (dependency), prefix.
+ * 
+ * @param array $options
+ * @return void
+ * @uses https://www.php-fig.org/psr/psr-0/
+ * @uses https://www.php-fig.org/psr/psr-4/
+ * @todo Use dynamic 'vendor' dir.
+ * @todo Use dynamic 'system' dir.
+ */
+function vanillePluginPackagerInit(array $options = []) {
+
+	vanillePluginPackagerDisplayMessage('VanillePlugin packaging in progress...');
+
+	// Init current dir
+	$dir = vanillePluginPackagerNormalizePath(getcwd());
+
+	// Check composer configuration
+	if ( !vanillePluginPackagerCheckComposer($dir) ) {
+		vanillePluginPackagerDisplayError(1);
+	}
+
+	// Init options
+	$dep    = $options['dep']    ?? 'vanilleplugin';
+	$lib    = $options['lib']    ?? '';
+	$prefix = $options['prefix'] ?? '';
+
+	// Init prefix
+	if ( empty($prefix = vanillePluginPackagerNormalizePrefix($prefix)) ) {
+		$prefix = vanillePluginPackagerGetRandomPrefix();
+	}
+
+	// Init vars
 	$sep = DIRECTORY_SEPARATOR;
-	$dir = getcwd();
-	$replacements = [
-		"{$dir}{$sep}core{$sep}vendor{$sep}jakiboy{$sep}vanilleplugin{$sep}src",
-		"{$dir}{$sep}core{$sep}vendor{$sep}jakiboy{$sep}vanilleplugin-task{$sep}src",
-		"{$dir}{$sep}core{$sep}vendor{$sep}composer",
-		"{$dir}{$sep}core{$sep}system"
-	];
-	foreach ($replacements as $replace) {
-		if ( is_dir($replace) ) {
-			foreach (getFiles($replace) as $file) {
-				$tmp = file_get_contents($file);
-				$tmp = prefixNamespace($tmp,$prefix);
-				$tmp = prefixUse($tmp,$prefix);
-				$tmp = prefixAutoload($tmp,$prefix);
-				@file_put_contents($file,$tmp);
+	$search = [];
+
+	// Init search dirs
+	if ( $dep === 'vanilleplugin' ) {
+		$search = [
+			"{$dir}{$sep}core{$sep}vendor{$sep}jakiboy{$sep}vanilleplugin{$sep}src",
+			"{$dir}{$sep}core{$sep}vendor{$sep}jakiboy{$sep}vanilleplugin-task{$sep}src",
+			"{$dir}{$sep}core{$sep}vendor{$sep}jakiboy{$sep}vanilleplugin-cache{$sep}src",
+			"{$dir}{$sep}core{$sep}vendor{$sep}twig{$sep}twig{$sep}src",
+			"{$dir}{$sep}core{$sep}vendor{$sep}justinrainbow{$sep}json-schema{$sep}src{$sep}JsonSchema",
+			"{$dir}{$sep}core{$sep}vendor{$sep}composer",
+			"{$dir}{$sep}core{$sep}system"
+		];
+
+	} else {
+		$search = [
+			"{$dir}{$sep}core{$sep}vendor{$sep}{$dep}",
+			"{$dir}{$sep}core{$sep}vendor{$sep}composer",
+			"{$dir}{$sep}core{$sep}system"
+		];
+	}
+
+	// Regenerate
+	$processed = vanillePluginPackagerRegenerate([
+		'dep'    => $dep,
+		'lib'    => $lib,
+		'prefix' => $prefix,
+		'search' => $search
+	]);
+
+	vanillePluginPackagerClearConsole();
+	vanillePluginPackagerDisplayMessage(
+		"VanillePlugin packaging completed ({$processed} items processed for '{$dep}')"
+	);
+	exit(0);
+}
+
+/**
+ * Regenerate prefixed 'namespaces', 'use', 'autoload'.
+ * 
+ * @param array $options
+ * @return int
+ */
+function vanillePluginPackagerRegenerate(array $options = []) {
+
+	if ( !isset($options['dep']) 
+		|| !isset($options['lib'])
+		|| !isset($options['prefix']) 
+		|| !isset($options['search']) ) {
+		vanillePluginPackagerDisplayError(0);
+	}
+
+	// Init vars
+	$count = 0;
+	$processed = 0;
+
+	// Process file search
+	foreach ($options['search'] as $replace) {
+		$replace = vanillePluginPackagerNormalizePath($replace);
+		if ( @is_dir($replace) ) {
+			$files = vanillePluginPackagerGetFiles($replace);
+			$count = count($files); // Set count
+			$processed = 0; // Reset processed
+			foreach ($files as $file) {
+				if ( @is_readable($file) ) {
+					if ( ($content = @file_get_contents($file)) ) {
+						$processed++;
+						$content = vanillePluginPackagerPrefix(
+							$content,
+							$options['dep'],
+							$options['lib'],
+							$options['prefix']
+						);
+						@file_put_contents($file,$content);
+					}
+				}
 			}
 		}
 	}
+
+	// Set error
+	if ( $processed == 0 ) {
+		vanillePluginPackagerDisplayError(2);
+
+	} elseif ( $count == 0 ) {
+		vanillePluginPackagerDisplayError(3);
+
+	} elseif ( $count !== $processed ) {
+		vanillePluginPackagerDisplayError(4);
+	}
+
+	return $processed;
 }
 
-// Prefix namespace
-function prefixNamespace($content, $prefix = ''){
-	$regex = '/(?i)namespace\s+VanillePlugin/';
-    return preg_replace($regex, "namespace {$prefix}VanillePlugin", $content);
+/**
+ * Prefix dependencies.
+ * 
+ * @param string $content
+ * @param string $dep
+ * @param string $lib
+ * @param string $prefix
+ * @return string
+ */
+function vanillePluginPackagerPrefix(string $content, string $dep, string $lib, string $prefix) {
+	if ( $dep === 'vanilleplugin' ) {
+		$content = vanillePluginPackagerPrefixNamespace($content,$prefix);
+		$content = vanillePluginPackagerPrefixUse($content,$prefix);
+		$content = vanillePluginPackagerPrefixAutoload($content,$prefix);
+	} else {
+		$content = vanillePluginPackagerPrefixDependencyNamespace($content,$lib,$prefix);
+		$content = vanillePluginPackagerPrefixDependencyUse($content,$lib,$prefix);
+		$content = vanillePluginPackagerPrefixDependencyAutoload($content,$lib,$prefix);
+	}
+	$content = vanillePluginPackagerGenerateComposerHeader($content);
+	return $content;
 }
 
-// Prefix use
-function prefixUse($content, $prefix = ''){
-	$regex = '/(?!(?i)use\s+VanillePluginConfig)(?i)use\s+VanillePlugin/';
-    return preg_replace($regex, "use {$prefix}VanillePlugin", $content);
+/**
+ * Prefix VanillePlugin 'namespace',
+ * Including VanillePlugin dependencies.
+ * 
+ * @param string $content
+ * @param string $prefix
+ * @return string
+ */
+function vanillePluginPackagerPrefixNamespace(string $content, string $prefix) {
+
+	// Prefix 'namespace VanillePlugin'
+	$pattern = '/(?i)namespace\s+VanillePlugin/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "namespace {$prefix}VanillePlugin", $content);
+	}
+	
+	// Prefix 'namespace VanilleCache'
+	$pattern = '/(?i)namespace\s+VanilleCache/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "namespace {$prefix}VanilleCache", $content);
+	}
+
+	// Prefix 'namespace VanilleTask'
+	$pattern = '/(?i)namespace\s+VanilleTask/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "namespace {$prefix}VanilleTask", $content);
+	}
+
+	// Prefix 'namespace Twig'
+	$pattern = '/(?i)namespace\s+Twig/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "namespace {$prefix}Twig", $content);
+	}
+
+	// Prefix 'namespace JsonSchema'
+	$pattern = '/(?i)namespace\s+JsonSchema/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "namespace {$prefix}JsonSchema", $content);
+	}
+	
+  return $content;
 }
 
-// Prefix autoload
-function prefixAutoload($content, $prefix = ''){
-	$regex = '/VanillePlugin\\\\\\\\/';
-    return preg_replace($regex, "{$prefix}VanillePlugin\\\\\\\\", $content);
+/**
+ * Prefix VanillePlugin 'use',
+ * Including VanillePlugin dependencies,
+ * Except VanillePluginConfig.
+ * 
+ * @param string $content
+ * @param string $prefix
+ * @return string
+ */
+function vanillePluginPackagerPrefixUse(string $content, string $prefix) {
+
+	// Prefix 'use VanillePlugin'
+	$pattern = '/(?!(?i)use\s+VanillePluginConfig)(?i)use\s+VanillePlugin/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "use {$prefix}VanillePlugin", $content);
+	}
+
+	// Prefix 'use VanilleCache'
+	$pattern = '/(?!(?i)use\s+VanillePluginConfig)(?i)use\s+VanilleCache/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "use {$prefix}VanilleCache", $content);
+	}
+
+	// Prefix 'use VanilleTask'
+	$pattern = '/(?!(?i)use\s+VanillePluginConfig)(?i)use\s+VanilleTask/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "use {$prefix}VanilleTask", $content);
+	}
+
+	// Prefix 'use Twig'
+	$pattern = '/(?i)use\s+Twig/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "use {$prefix}Twig", $content);
+	}
+
+	// Prefix 'use JsonSchema'
+	$pattern = '/(?i)use\s+JsonSchema/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "use {$prefix}JsonSchema", $content);
+	}
+
+  return $content;
 }
 
-// Normalize prefix
-function normalize($prefix){
-	return ucfirst(preg_replace('~[^\pL\d]+~u','',$prefix));
+/**
+ * Prefix VanillePlugin 'autoload',
+ * Including VanillePlugin dependencies.
+ * 
+ * @param string $content
+ * @param string $prefix
+ * @return string
+ */
+function vanillePluginPackagerPrefixAutoload(string $content, string $prefix) {
+
+	// Prefix 'VanillePlugin autoload'
+	$pattern = '/VanillePlugin\\\\\\\\/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "{$prefix}VanillePlugin\\\\\\\\", $content);
+	}
+
+	// Prefix 'VanilleCache autoload'
+	$pattern = '/VanilleCache\\\\\\\\/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "{$prefix}VanilleCache\\\\\\\\", $content);
+	}
+
+	// Prefix 'VanilleTask autoload'
+	$pattern = '/VanilleTask\\\\\\\\/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "{$prefix}VanilleTask\\\\\\\\", $content);
+	}
+
+	// Prefix 'Twig autoload'
+	$pattern = '/Twig\\\\\\\\/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "{$prefix}Twig\\\\\\\\", $content);
+	}
+
+	// Prefix 'JsonSchema autoload'
+	$pattern = '/JsonSchema\\\\\\\\/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "{$prefix}JsonSchema\\\\\\\\", $content);
+	}
+
+  return $content;
 }
 
-// Get random string
-function getRandom(){
-	$chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-	return ucfirst(substr(str_shuffle($chars),0,10));
+/**
+ * Prefix dependency 'namespace',
+ * Used dynamic pattern.
+ * 
+ * @param string $content
+ * @param string $lib
+ * @param string $prefix
+ * @return string
+ */
+function vanillePluginPackagerPrefixDependencyNamespace(string $content, string $lib, string $prefix) {
+
+	$pattern = "/(?i)namespace\s+{$lib}/";
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "namespace {$prefix}{$lib}", $content);
+	}
+
+  return $content;
 }
 
-// Get Lib Files
-function getFiles($dir, &$files = []) {
-	$sep = DIRECTORY_SEPARATOR;
-    $objects = scandir($dir);
-    foreach ($objects as $key => $value) {
-        $path = realpath("{$dir}{$sep}{$value}");
-        if ( filetype($path) == 'file' ) {
-        	if ( pathinfo($path,PATHINFO_EXTENSION) == 'php' ) {
-        		$files[] = $path;
-        	}
-        } elseif ( $value !== '.' && $value !== '..' ) {
-        	getFiles($path, $files);
-        }
+/**
+ * Prefix dependency 'use',
+ * Used dynamic pattern.
+ * 
+ * @param string $content
+ * @param string $lib
+ * @param string $prefix
+ * @return string
+ */
+function vanillePluginPackagerPrefixDependencyUse(string $content, string $lib, string $prefix) {
+
+	$pattern = "/(?i)use\s+{$lib}/";
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "use {$prefix}{$lib}", $content);
+	}
+
+  return $content;
+}
+
+/**
+ * Prefix dependency 'autoload',
+ * Used dynamic pattern.
+ * 
+ * @param string $content
+ * @param string $lib
+ * @param string $prefix
+ * @return string
+ */
+function vanillePluginPackagerPrefixDependencyAutoload(string $content, string $lib, string $prefix) {
+
+	$pattern = "/{$lib}\\\\\\\\/";
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "{$prefix}{$lib}\\\\\\\\", $content);
+	}
+
+  return $content;
+}
+
+/**
+ * Generate composer header 'autoload'.
+ * 
+ * @param string $content
+ * @return string
+ */
+function vanillePluginPackagerGenerateComposerHeader(string $content) {
+
+	$pattern = "/@generated\s+by\s+Composer/";
+	if ( (bool)preg_match($pattern,$content) ) {
+		$header  = "@generated by Composer (Prefixed by ";
+		$header .= PACKAGER_NAME . ' v';
+		$header .= PACKAGER_VERSION . ')';
+		$content = preg_replace($pattern, $header, $content);
+	}
+
+  return $content;
+}
+
+/**
+ * Normalize prefix,
+ * Used advanced arg '\!' to allow lowercase.
+ * 
+ * @param mixed $prefix
+ * @return string
+ * @uses https://www.php-fig.org/psr/psr-1/
+ */
+function vanillePluginPackagerNormalizePrefix($prefix) {
+	$prefix = strtolower($prefix);
+	if ( substr($prefix,0,1) !== '!' ) {
+		$prefix = ucfirst($prefix);
+	}
+	return preg_replace("/[^a-zA-Z]/",'',$prefix);
+}
+
+/**
+ * Normalize path.
+ * 
+ * @param string $path
+ * @return string
+ */
+function vanillePluginPackagerNormalizePath(string $path) {
+	return str_replace('\\','/',$path);
+}
+
+/**
+ * Get random prefix,
+ * Accept: Alphabetic lowercase chars.
+ * 
+ * @param int $i, Chars length
+ * @return string
+ * @uses https://www.php-fig.org/psr/psr-1/
+ */
+function vanillePluginPackagerGetRandomPrefix(int $i = 10) {
+	if ( $i > 20 ) {
+		$i = 20; // Max
+	} elseif ( $i < 10 ) {
+		$i = 10; // Min
+	}
+	$chars = 'abcdefghijklmnopqrstuvwxyz';
+	return ucfirst(
+		substr(str_shuffle($chars),0,$i)
+	);
+}
+
+/**
+ * Get dependency files.
+ * 
+ * @param string $dir
+ * @param array $files
+ * @return array
+ * @todo Use regex(i) instead of pathinfo()
+ */
+function vanillePluginPackagerGetFiles(string $dir, &$files = []) {
+    if ( ($objects = @scandir($dir)) ) {
+    	$sep = DIRECTORY_SEPARATOR;
+	    foreach ($objects as $key => $value) {
+	        $path = vanillePluginPackagerNormalizePath(
+	        	realpath("{$dir}{$sep}{$value}")
+	        );
+	        if ( @is_file($path) ) {
+	        	if ( pathinfo($path,PATHINFO_EXTENSION) == 'php' ) {
+	        		$files[] = $path;
+	        	}
+	        } elseif ( $value !== '.' && $value !== '..' ) {
+	        	vanillePluginPackagerGetFiles($path,$files);
+	        }
+	    }
     }
     return $files;
 }
 
-// Parse args
-function parse($argv){
+/**
+ * Parse command-line options,
+ * Set default options.
+ * 
+ * @param array $arg
+ * @return array
+ */
+function vanillePluginPackagerParseOptions(array $arg) {
+
 	$tmp = [];
-	if ( isset($argv[2]) ) {
-		$tmp[$argv[1]] = $argv[2];
-	} else {
-		if ( isset($argv[1]) ) {
-			$tmp[$argv[1]] = true;
+	unset($arg[0]); // Remove unused arg
+
+	if ( isset($arg[1]) ) {
+
+		if ( $arg[1] == '-reg' ) {
+
+			// Regenerate VanillePlugin options
+			$tmp['reg'] = true; // Enable option
+
+			// Set random prefix (Default)
+			$tmp['prefix'] = true; 
+
+			// Set prefix
+			if ( isset($arg[2]) && is_string($arg[2]) ) {
+				$tmp['prefix'] = $arg[2];
+			}
+
+		} elseif ( $arg[1] == '-regd' ) {
+
+			// Regenerate dependency options (Advanced)
+			if ( (isset($arg[2]) && $arg[2] == '-d') 
+				&& (isset($arg[4]) && $arg[4] == '-l') ) {
+
+				// Set dependency src & library name (Required)
+				if ( (isset($arg[3]) && is_string($arg[3])) 
+					&& (isset($arg[5]) && is_string($arg[5])) ) {
+					$tmp['dep'] = $arg[3];
+					$tmp['lib'] = $arg[5];
+				}
+
+				if ( isset($tmp['dep']) && isset($tmp['lib']) ) {
+
+					$tmp['regd'] = true; // Enable option
+
+					// Set random prefix (Default)
+					$tmp['prefix'] = true;
+
+					// Set prefix
+					if ( isset($arg[6]) && $arg[6] == '-p' ) {
+						if ( isset($arg[7]) && is_string($arg[7]) ) {
+							$tmp['prefix'] = $arg[7];
+						}
+					}
+				}
+			}
+
+		} elseif ( $arg[1] == '-test' ) {
+			// Set prefix (Required)
+			if ( isset($arg[2]) && is_string($arg[2]) ) {
+				$tmp['test'] = true; // Enable option
+				$tmp['prefix'] = $arg[2];
+			}
+
+		} elseif ( $arg[1] == '--version' ) {
+			$tmp['version'] = true; // Enable option
+
+		} elseif ( $arg[1] == '-v' ) {
+			$tmp['v'] = true; // Enable option
+
+		} elseif ( $arg[1] == '--help' ) {
+			$tmp['help'] = true; // Enable option
+
+		} elseif ( $arg[1] == '-h' ) {
+			$tmp['h'] = true; // Enable option
 		}
+
 	}
+
 	return $tmp;
 }
 
-// Show help
-function showHelp(){
-	echo 
-	<<<HLP
+/**
+ * Check composer configuration.
+ * 
+ * @param string $dir
+ * @return bool
+ * @uses https://getcomposer.org/doc/03-cli.md#check-platform-reqs
+ * @uses https://getcomposer.org/doc/03-cli.md#dump-autoload-dumpautoload
+ */
+function vanillePluginPackagerCheckComposer(string $dir) {
+	$sep = DIRECTORY_SEPARATOR;
+	$file = vanillePluginPackagerNormalizePath("{$dir}{$sep}composer.json");
+	if ( !@is_readable($file) ) {
+		return false;
+	}
+	if ( !($config = json_decode(@file_get_contents($file),true)) ) {
+		return false;
+	}
+	if ( isset($config['require-dev']) && !empty($config['require-dev']) ) {
+		return false;
+	}
+	if ( !isset($config['config']['optimize-autoloader']) || $config['config']['optimize-autoloader'] == false ) {
+		return false;
+	}
+	return true;
+}
 
-	VanillePlugin Prefixer (WordPress Plugin Namespaces Prefixer)
+/**
+ * Test packaging prefix.
+ * 
+ * @param string $prefix
+ * @return void
+ */
+function vanillePluginPackagerTestPrefix(string $prefix) {
 
-	Usage: vanilleplugin -generate [prefix]
+	// Init current dir
+	$dir = vanillePluginPackagerNormalizePath(getcwd());
 
-	Options:
-	       -generate [prefix]    Generate namespace prefix
-	       -generate             Generate random namespace prefix
+	// Init prefix
+	if ( empty($prefix = vanillePluginPackagerNormalizePrefix($prefix)) ) {
+		vanillePluginPackagerDisplayError(0);
+	}
 
-	HLP;
-	exit(1);
+	// Init vars
+	$sep = DIRECTORY_SEPARATOR;
+	$search = [];
+	$count = 0;
+	$processed = 0;
+
+	// Init search dirs
+	$search = [
+		"{$dir}{$sep}core{$sep}vendor",
+		"{$dir}{$sep}core{$sep}system"
+	];
+
+	// Process file search
+	foreach ($search as $replace) {
+		$replace = vanillePluginPackagerNormalizePath($replace);
+		if ( @is_dir($replace) ) {
+			$files = vanillePluginPackagerGetFiles($replace);
+			$count += count($files); // Set count
+			foreach ($files as $file) {
+				if ( @is_readable($file) ) {
+					if ( ($content = @file_get_contents($file)) ) {
+
+						// Test 'namespace' prefix
+						$pattern = "/namespace\s+{$prefix}[^\\\\]([a-zA-Z]){0,};/";
+						preg_match_all($pattern,$content,$matches,PREG_SET_ORDER,0);
+						if ( isset($matches[0]) ) {
+							# debug ...
+							if ( ($matche = array_shift($matches[0])) ) {
+								if ( is_string($matche) && !empty($matche) ) {
+									$processed++;
+								}
+							}
+						}
+
+						// Test 'use' prefix
+						$pattern = "/use\s+{$prefix}[^\\\\\\\\]([a-zA-Z]).*;/";
+						preg_match_all($pattern,$content,$matches,PREG_SET_ORDER,0);
+						if ( isset($matches[0]) ) {
+							# debug ...
+							if ( ($matche = array_shift($matches[0])) ) {
+								if ( is_string($matche) && !empty($matche) ) {
+									$processed++;
+								}
+							}
+						}
+
+						// Test 'autoload' prefix
+						$pattern = "/\'{$prefix}([a-zA-Z]){0,}\\\\\\\\\'/";
+						preg_match_all($pattern,$content,$matches,PREG_SET_ORDER,0);
+						if ( isset($matches[0]) ) {
+							# debug ...
+							if ( ($matche = array_shift($matches[0])) ) {
+								if ( is_string($matche) && !empty($matche) ) {
+									$processed++;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	vanillePluginPackagerClearConsole();
+	vanillePluginPackagerDisplayMessage(
+		PACKAGER_NAME . " Tested: {$processed} prefixe(s) / {$count} file(s)"
+	);
+	exit(0);
+}
+
+/**
+ * Display version.
+ * 
+ * @param void
+ * @return void
+ */
+function vanillePluginPackagerDisplayVersion() {
+	vanillePluginPackagerDisplayMessage(PACKAGER_VERSION,'37');
+	exit(0);
+}
+
+/**
+ * Display error.
+ * 
+ * @param int $n, Error number
+ * @return void
+ */
+function vanillePluginPackagerDisplayError(int $n) {
+	vanillePluginPackagerClearConsole();
+	$error = 'Error: ';
+	switch ($n) {
+		case 1:
+			$error .= 'Missing or Invalid composer configuration';
+			break;
+
+		case 2:
+			$error .= 'No files processed';
+			break;
+
+		case 3:
+			$error .= 'No files found';
+			break;
+
+		case 4:
+			$error .= 'Processed items does not match files count';
+			break;
+
+		default:
+			$error .= 'No execution, use [vanilleplugin -h] for more details';
+			break;
+	}
+	exit("\r\n\e[0;31;1;40m{$error} (error N° {$n})\e[0m\r\n");
+}
+
+/**
+ * Display message.
+ * 
+ * @param string $msg, Message
+ * @param string $c, Message color
+ * @param string $f, Message format
+ * @return void
+ */
+function vanillePluginPackagerDisplayMessage(string $msg = '', string $c = '1;32', string $f = '1') {
+	$bg = '40';
+	echo "\r\n\e[{$c};{$f};{$bg}m{$msg}\e[0m\r\n";
+}
+
+/**
+ * Clear console.
+ * 
+ * @param void
+ * @return void
+ */
+function vanillePluginPackagerClearConsole() {
+	system('cls');
+	system('clear');
+}
+
+/**
+ * Display help.
+ * 
+ * @param void
+ * @return void
+ */
+function vanillePluginPackagerDisplayHelp() {
+
+	vanillePluginPackagerClearConsole();
+
+	echo
+	<<<EOT
+	  __      __         _ _ _      _____  _             _         _____           _                         
+	  \ \    / /        (_| | |    |  __ \| |           (_)       |  __ \         | |                        
+	   \ \  / __ _ _ __  _| | | ___| |__) | |_   _  __ _ _ _ __   | |__) __ _  ___| | ____ _  __ _  ___ _ __ 
+	    \ \/ / _` | '_ \| | | |/ _ |  ___/| | | | |/ _` | | '_ \  |  ___/ _` |/ __| |/ / _` |/ _` |/ _ | '__|
+	     \  | (_| | | | | | | |  __| |    | | |_| | (_| | | | | | | |  | (_| | (__|   | (_| | (_| |  __| |   
+	      \/ \__,_|_| |_|_|_|_|\___|_|    |_|\__,_|\__, |_|_| |_| |_|   \__,_|\___|_|\_\__,_|\__, |\___|_|   
+	                                                __/ |                                     __/ |          
+	                                               |___/                                     |___/            
+	EOT;
+
+	$header  = "\r\n \e[0;32;40m";
+	$header .= PACKAGER_NAME . " \e[0m\e[0;33;40mv";
+	$header .= PACKAGER_VERSION . "\e[0m (";
+	$header .= PACKAGER_DESC . ")\r\n ";
+	$header .= PACKAGER_SYNOPSIS . "\r\n by: (c)";
+	$header .= PACKAGER_AUTHOR . " (\e[0;33;4;40m";
+	$header .= PACKAGER_LINK . "\e[0m)";
+	vanillePluginPackagerDisplayMessage($header,'37','3');
+
+	echo
+	<<<EOT
+
+	 \e[0;33;40mRequirements:\e[0m
+	   -> composer.json (Plugin root)
+	   -> composer update --no-dev -o
+	   -> PSR-0/PSR-4
+
+	 \e[0;33;40mUsage:\e[0m
+	   \e[0;32;40mvanilleplugin -reg\e[0m                     \e[0;33;40m(empty|null)\e[0m
+	   \e[0;32;40mvanilleplugin -reg\e[0m                     \e[0;33;40m(prefix [\$prefix])\e[0m
+	   \e[0;32;40mvanilleplugin -regd\e[0m                    \e[0;33;40m-d (src [\$dep]) -l (name [\$lib])
+	   \e[0;32;40mvanilleplugin -regd\e[0m                    \e[0;33;40m-d (src [\$dep]) -l (name [\$lib]) -p (prefix [\$prefix])\e[0m
+	   \e[0;32;40mvanilleplugin -test\e[0m                    \e[0;33;40m(prefix [\$prefix])\e[0m
+
+	 \e[0;33;40mOptions:\e[0m
+	   \e[0;32;40m-h, --help\e[0m                             Display packager help
+	   \e[0;32;40m-v, --version\e[0m                          Display packager version
+	   \e[0;32;40m-reg\e[0m                                   Regenerate VanillePlugin namespaces using random prefix
+	   \e[0;32;40m-reg [prefix]\e[0m                          Regenerate VanillePlugin namespaces
+	   \e[0;32;40m-regd [-d dep] [-l lib]\e[0m                Regenerate dependency namespaces using random prefix
+	   \e[0;32;40m-regd [-d dep] [-l lib] [-p prefix]\e[0m    Regenerate dependency namespaces
+	   \e[0;32;40m-test [prefix]\e[0m                         Test packaging prefixed namespaces
+
+	 \e[0;33;40mAdvanced:\e[0m
+	   \e[0;32;40m\![prefix]\e[0m                             Disable capitalization (StudlyCaps)
+
+	 \e[0;33;40mExamples:\e[0m
+	   vanilleplugin -reg
+	   vanilleplugin -reg prefix
+	   vanilleplugin -reg \!prefix
+	   vanilleplugin -regd -d Foo/Bar/src -l FooBar -p prefix
+	   vanilleplugin -regd -d Foo/Bar/src -l FooBar -p \!prefix
+	   vanilleplugin -regd -d Foo/Bar/src -l FooBar
+	   vanilleplugin -test prefix
+	   vanilleplugin -test \!prefix
+
+	EOT;
+	exit(0);
 }

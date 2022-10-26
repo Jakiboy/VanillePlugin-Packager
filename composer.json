@@ -1,7 +1,8 @@
 {
   "name": "jakiboy/vanilleplugin-packager",
   "version" : "0.2.1",
-  "description": "Wrap VanillePlugin as a package under prefixed namespace",
+  "description": "Composer Namespaces Prefixer for WordPress Plugins",
+  "keywords": ["php","WordPress","WordPress-plugins-namespaces-prefixer","dependencies","prefixer"],
   "license": "MIT",
   "authors": [
     {
@@ -16,7 +17,7 @@
     }
   ],
   "require": {
-    "php": "^7.4|^8.0"
+    "php": "^7.2"
   },
   "bin": [
     "bin/vanilleplugin"
