@@ -3,6 +3,8 @@
 VanillePlugin Packager is a **Composer Namespaces Prefixer for WordPress Plugins**, Used to prefix [VanillePlugin WordPress Plugin Framework](https://jakiboy.github.io/VanillePlugin/) And other composer dependencies.  
 Resolve **dependencies versions conflicts of WordPress plugins** built using Composer, Without ~~hardcoding~~.
 
+Works also for non Composer plugins, By Wrapping your dependencies with your own custom namespace, in order to avoid conflicts with **other plugins that are loading the same dependencies in different versions**.
+
 <a href="https://jakiboy.github.io/VanillePlugin-Packager/">
 	<img src="https://raw.githubusercontent.com/Jakiboy/VanillePlugin-Packager/master/console.png" alt="VanillePlugin Packager">
 </a>
@@ -102,7 +104,7 @@ See also the full list of [contributors](https://github.com/Jakiboy/VanillePlugi
 ## License:
 
 
-This project is licensed under the MIT License - see the [LICENSE.txt](https://github.com/Jakiboy/VanillePlugin-Packager/blob/master/LICENSE.txt) file for details.
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/Jakiboy/VanillePlugin-Packager/blob/master/LICENSE) file for details.
 
 ## Todo:
 
