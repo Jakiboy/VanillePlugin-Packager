@@ -1,6 +1,6 @@
 {
   "name": "jakiboy/vanilleplugin-packager",
-  "version" : "0.2.1",
+  "version" : "0.3.0",
   "description": "Composer Namespaces Prefixer for WordPress Plugins",
   "keywords": ["php","WordPress","WordPress-plugins-namespaces-prefixer","dependencies","prefixer"],
   "license": "MIT",

@@ -1,11 +1,11 @@
 # Security Policy
 
-## Supported Versions
+## Supported Versions (CLI)
 
-| Version | Supported          |
-| ------- | ------------------ |
-| >=7.2.x | :white_check_mark: |
-| < 7.2   | :x:                |
+| Version    | Supported   |
+| ---------- | ----------- |
+| **>= 7.2** | **Yes**     |
+| **< 7.2**  | **No**      |
 
 ## Reporting a Vulnerability
 
