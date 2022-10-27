@@ -11,8 +11,6 @@ Works also for non Composer plugins, By Wrapping your dependencies with your own
 
 ## ⚡ Installing:
 
-Using composer.
-
 ```
 composer global require --dev jakiboy/vanilleplugin-packager
 ```
@@ -102,7 +100,6 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 See also the full list of [contributors](https://github.com/Jakiboy/VanillePlugin-Packager/contributors) who participated in this project. Any suggestions (Pull requests) are welcome!
 
 ## License:
-
 
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/Jakiboy/VanillePlugin-Packager/blob/master/LICENSE) file for details.
 

@@ -2,10 +2,10 @@
 
 ## Supported Versions (CLI)
 
-| Version    | Supported   |
-| ---------- | ----------- |
-| **>= 7.2** | **Yes**     |
-| **< 7.2**  | **No**      |
+| Version    | Supported  |
+| ---------- | ---------- |
+| **>= 7.2** | **Yes**    |
+| **< 7.2**  | **No**     |
 
 ## Reporting a Vulnerability
 
