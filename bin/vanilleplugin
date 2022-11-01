@@ -3,7 +3,7 @@
 /**
  * @author    : JIHAD SINNAOUR
  * @package   : VanillePlugin Packager
- * @version   : 0.3.0
+ * @version   : 0.3.1
  * @copyright : (c) 2022 Jihad Sinnaour <mail@jihadsinnaour.com>
  * @link      : https://github.com/Jakiboy/VanillePlugin-Packager
  * @license   : MIT
@@ -30,7 +30,7 @@ if ( (php_sapi_name() !== 'cli')
 define('PACKAGER_NAME','VanillePlugin Packager');
 define('PACKAGER_DESC','Composer Namespaces Prefixer for WordPress Plugins');
 define('PACKAGER_SYNOPSIS','Resolve dependencies versions conflicts of WordPress plugins built using Composer.');
-define('PACKAGER_VERSION','0.3.0');
+define('PACKAGER_VERSION','0.3.1');
 define('PACKAGER_AUTHOR','Jihad Sinnaour');
 define('PACKAGER_LINK','https://jakiboy.github.io/VanillePlugin-Packager/');
 
@@ -238,6 +238,7 @@ function vanillePluginPackagerRegenerate(array $options = []) {
 function vanillePluginPackagerPrefix(string $content, string $dep, string $lib, string $prefix) {
 	if ( $dep === 'vanilleplugin' ) {
 		$content = vanillePluginPackagerPrefixNamespace($content,$prefix);
+		$content = vanillePluginPackagerPrefixFunction($content,$prefix);
 		$content = vanillePluginPackagerPrefixUse($content,$prefix);
 		$content = vanillePluginPackagerPrefixAutoload($content,$prefix);
 	} else {
@@ -376,6 +377,686 @@ function vanillePluginPackagerPrefixAutoload(string $content, string $prefix) {
 		$content = preg_replace($pattern, "{$prefix}JsonSchema\\\\\\\\", $content);
 	}
 
+  return $content;
+}
+
+/**
+ * Prefix VanillePlugin 'function',
+ * Including VanillePlugin dependencies.
+ * 
+ * @param string $content
+ * @param string $prefix
+ * @return string
+ */
+function vanillePluginPackagerPrefixFunction(string $content, string $prefix) {
+
+	// Prefix 'function Twig'
+	# twig_constant_is_defined
+	$pattern = '/function twig_constant_is_defined/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_constant_is_defined", $content);
+	}
+	$pattern = '/\'twig_constant_is_defined\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_constant_is_defined'", $content);
+	}
+	$pattern = '/= twig_constant_is_defined\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_constant_is_defined(", $content);
+	}
+
+	# twig_constant
+	$pattern = '/function twig_constant/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_constant", $content);
+	}
+	$pattern = '/\'twig_constant\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_constant'", $content);
+	}
+	$pattern = '/= twig_constant\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_constant(", $content);
+	}
+
+	# twig_cycle
+	$pattern = '/function twig_cycle/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_cycle", $content);
+	}
+	$pattern = '/\'twig_cycle\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_cycle'", $content);
+	}
+	$pattern = '/= twig_cycle\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_cycle(", $content);
+	}
+
+	# twig_random
+	$pattern = '/function twig_random/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_random", $content);
+	}
+	$pattern = '/\'twig_random\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_random'", $content);
+	}
+	$pattern = '/= twig_random\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_random(", $content);
+	}
+
+	# twig_date_converter
+	$pattern = '/function twig_date_converter/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_date_converter", $content);
+	}
+	$pattern = '/\'twig_date_converter\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_date_converter'", $content);
+	}
+	$pattern = '/= twig_date_converter\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_date_converter(", $content);
+	}
+	
+	# twig_include
+	$pattern = '/function twig_include/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_include", $content);
+	}
+	$pattern = '/\'twig_include\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_include'", $content);
+	}
+	$pattern = '/= twig_include\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_include(", $content);
+	}
+
+	# twig_source
+	$pattern = '/function twig_source/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_source", $content);
+	}
+	$pattern = '/\'twig_source\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_source'", $content);
+	}
+	$pattern = '/= twig_source\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_source(", $content);
+	}
+
+	# twig_test_empty
+	$pattern = '/function twig_test_empty/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_test_empty", $content);
+	}
+	$pattern = '/\'twig_test_empty\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_test_empty'", $content);
+	}
+	$pattern = '/= twig_test_empty\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_test_empty(", $content);
+	}
+
+	# twig_test_iterable
+	$pattern = '/function twig_test_iterable/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_test_iterable", $content);
+	}
+	$pattern = '/\'twig_test_iterable\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_test_iterable'", $content);
+	}
+	$pattern = '/= twig_test_iterable\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_test_iterable(", $content);
+	}
+
+	# twig_date_format_filter
+	$pattern = '/function twig_date_format_filter/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_date_format_filter", $content);
+	}
+	$pattern = '/\'twig_date_format_filter\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_date_format_filter'", $content);
+	}
+	$pattern = '/= twig_date_format_filter\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_date_format_filter(", $content);
+	}
+
+	# twig_date_modify_filter
+	$pattern = '/function twig_date_modify_filter/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_date_modify_filter", $content);
+	}
+	$pattern = '/\'twig_date_modify_filter\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_date_modify_filter'", $content);
+	}
+	$pattern = '/= twig_date_modify_filter\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_date_modify_filter(", $content);
+	}
+
+	# twig_sprintf
+	$pattern = '/function twig_sprintf/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_sprintf", $content);
+	}
+	$pattern = '/\'twig_sprintf\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_sprintf'", $content);
+	}
+	$pattern = '/= twig_sprintf\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_sprintf(", $content);
+	}
+
+	# twig_replace_filter
+	$pattern = '/function twig_replace_filter/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_replace_filter", $content);
+	}
+	$pattern = '/\'twig_replace_filter\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_replace_filter'", $content);
+	}
+	$pattern = '/= twig_replace_filter\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_replace_filter(", $content);
+	}
+
+	# twig_number_format_filter
+	$pattern = '/function twig_number_format_filter/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_number_format_filter", $content);
+	}
+	$pattern = '/\'twig_number_format_filter\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_number_format_filter'", $content);
+	}
+	$pattern = '/= twig_number_format_filter\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_number_format_filter(", $content);
+	}
+
+	# twig_round
+	$pattern = '/function twig_round/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_round", $content);
+	}
+	$pattern = '/\'twig_round\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_round'", $content);
+	}
+	$pattern = '/= twig_round\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_round(", $content);
+	}
+
+	# twig_urlencode_filter
+	$pattern = '/function twig_urlencode_filter/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_urlencode_filter", $content);
+	}
+	$pattern = '/\'twig_urlencode_filter\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_urlencode_filter'", $content);
+	}
+	$pattern = '/= twig_urlencode_filter\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_urlencode_filter(", $content);
+	}
+
+	# twig_convert_encoding
+	$pattern = '/function twig_convert_encoding/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_convert_encoding", $content);
+	}
+	$pattern = '/\'twig_convert_encoding\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_convert_encoding'", $content);
+	}
+	$pattern = '/= twig_convert_encoding\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_convert_encoding(", $content);
+	}
+
+	# twig_title_string_filter
+	$pattern = '/function twig_title_string_filter/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_title_string_filter", $content);
+	}
+	$pattern = '/\'twig_title_string_filter\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_title_string_filter'", $content);
+	}
+	$pattern = '/= twig_title_string_filter\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_title_string_filter(", $content);
+	}
+
+	# twig_capitalize_string_filter
+	$pattern = '/function twig_capitalize_string_filter/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_capitalize_string_filter", $content);
+	}
+	$pattern = '/\'twig_capitalize_string_filter\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_capitalize_string_filter'", $content);
+	}
+	$pattern = '/= twig_capitalize_string_filter\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_capitalize_string_filter(", $content);
+	}
+	
+	# twig_upper_filter
+	$pattern = '/function twig_upper_filter/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_upper_filter", $content);
+	}
+	$pattern = '/\'twig_upper_filter\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_upper_filter'", $content);
+	}
+	$pattern = '/= twig_upper_filter\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_upper_filter(", $content);
+	}
+	
+	# twig_lower_filter
+	$pattern = '/function twig_lower_filter/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_lower_filter", $content);
+	}
+	$pattern = '/\'twig_lower_filter\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_lower_filter'", $content);
+	}
+	$pattern = '/= twig_lower_filter\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_lower_filter(", $content);
+	}
+	
+	# twig_striptags
+	$pattern = '/function twig_striptags/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_striptags", $content);
+	}
+	$pattern = '/\'twig_striptags\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_striptags'", $content);
+	}
+	$pattern = '/= twig_striptags\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_striptags(", $content);
+	}
+	
+	# twig_trim_filter
+	$pattern = '/function twig_trim_filter/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_trim_filter", $content);
+	}
+	$pattern = '/\'twig_trim_filter\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_trim_filter'", $content);
+	}
+	$pattern = '/= twig_trim_filter\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_trim_filter(", $content);
+	}
+	
+	# twig_nl2br
+	$pattern = '/function twig_nl2br/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_nl2br", $content);
+	}
+	$pattern = '/\'twig_nl2br\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_nl2br'", $content);
+	}
+	$pattern = '/= twig_nl2br\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_nl2br(", $content);
+	}
+	
+	# twig_spaceless
+	$pattern = '/function twig_spaceless/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_spaceless", $content);
+	}
+	$pattern = '/\'twig_spaceless\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_spaceless'", $content);
+	}
+	$pattern = '/= twig_spaceless\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_spaceless(", $content);
+	}
+	
+	# twig_join_filter
+	$pattern = '/function twig_join_filter/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_join_filter", $content);
+	}
+	$pattern = '/\'twig_join_filter\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_join_filter'", $content);
+	}
+	$pattern = '/= twig_join_filter\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_join_filter(", $content);
+	}
+	
+	# twig_split_filter
+	$pattern = '/function twig_split_filter/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_split_filter", $content);
+	}
+	$pattern = '/\'twig_split_filter\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_split_filter'", $content);
+	}
+	$pattern = '/= twig_split_filter\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_split_filter(", $content);
+	}
+	
+	# twig_sort_filter
+	$pattern = '/function twig_sort_filter/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_sort_filter", $content);
+	}
+	$pattern = '/\'twig_sort_filter\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_sort_filter'", $content);
+	}
+	$pattern = '/= twig_sort_filter\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_sort_filter(", $content);
+	}
+	
+	# twig_array_merge
+	$pattern = '/function twig_array_merge/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_array_merge", $content);
+	}
+	$pattern = '/\'twig_array_merge\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_array_merge'", $content);
+	}
+	$pattern = '/= twig_array_merge\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_array_merge(", $content);
+	}
+	
+	# twig_array_batch
+	$pattern = '/function twig_array_batch/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_array_batch", $content);
+	}
+	$pattern = '/\'twig_array_batch\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_array_batch'", $content);
+	}
+	$pattern = '/= twig_array_batch\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_array_batch(", $content);
+	}
+	
+	# twig_array_column
+	$pattern = '/function twig_array_column/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_array_column", $content);
+	}
+	$pattern = '/\'twig_array_column\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_array_column'", $content);
+	}
+	$pattern = '/= twig_array_column\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_array_column(", $content);
+	}
+	
+	# twig_array_filter
+	$pattern = '/function twig_array_filter/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_array_filter", $content);
+	}
+	$pattern = '/\'twig_array_filter\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_array_filter'", $content);
+	}
+	$pattern = '/= twig_array_filter\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_array_filter(", $content);
+	}
+	
+	# twig_array_map
+	$pattern = '/function twig_array_map/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_array_map", $content);
+	}
+	$pattern = '/\'twig_array_map\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_array_map'", $content);
+	}
+	$pattern = '/= twig_array_map\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_array_map(", $content);
+	}
+	
+	# twig_array_reduce
+	$pattern = '/function twig_array_reduce/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_array_reduce", $content);
+	}
+	$pattern = '/\'twig_array_reduce\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_array_reduce'", $content);
+	}
+	$pattern = '/= twig_array_reduce\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_array_reduce(", $content);
+	}
+	
+	# twig_reverse_filter
+	$pattern = '/function twig_reverse_filter/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_reverse_filter", $content);
+	}
+	$pattern = '/\'twig_reverse_filter\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_reverse_filter'", $content);
+	}
+	$pattern = '/= twig_reverse_filter\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_reverse_filter(", $content);
+	}
+	
+	# twig_length_filter
+	$pattern = '/function twig_length_filter/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_length_filter", $content);
+	}
+	$pattern = '/\'twig_length_filter\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_length_filter'", $content);
+	}
+	$pattern = '/= twig_length_filter\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_length_filter(", $content);
+	}
+	
+	# twig_slice
+	$pattern = '/function twig_slice/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_slice", $content);
+	}
+	$pattern = '/\'twig_slice\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_slice'", $content);
+	}
+	$pattern = '/= twig_slice\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_slice(", $content);
+	}
+	
+	# twig_first
+	$pattern = '/function twig_first/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_first", $content);
+	}
+	$pattern = '/\'twig_first\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_first'", $content);
+	}
+	$pattern = '/= twig_first\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_first(", $content);
+	}
+	
+	# twig_last
+	$pattern = '/function twig_last/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_last", $content);
+	}
+	$pattern = '/\'twig_last\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_last'", $content);
+	}
+	$pattern = '/= twig_last\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_last(", $content);
+	}
+		
+	# twig_get_array_keys_filter
+	$pattern = '/function twig_get_array_keys_filter/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_get_array_keys_filter", $content);
+	}
+	$pattern = '/\'twig_get_array_keys_filter\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_get_array_keys_filter'", $content);
+	}
+	$pattern = '/= twig_get_array_keys_filter\(/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_get_array_keys_filter(", $content);
+	}
+	
+	# _twig_default_filter
+	$pattern = '/function _twig_default_filter/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function _{$prefix}_twig_default_filter", $content);
+	}
+	$pattern = '/\'_twig_default_filter\'/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'_{$prefix}_twig_default_filter'", $content);
+	}
+	$pattern = '/= _twig_default_filter\(/'; #inline
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= _{$prefix}_twig_default_filter(", $content);
+	}
+
+	# twig_in_filter
+	$pattern = '/function twig_in_filter/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_in_filter", $content);
+	}
+	$pattern = '/\'twig_in_filter\(\'/'; #raw
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_in_filter('", $content);
+	}
+	$pattern = '/\'!twig_in_filter\(\'/'; #raw
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'!{$prefix}_twig_in_filter('", $content);
+	}
+
+	# twig_compare
+	$pattern = '/function twig_compare/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_compare", $content);
+	}
+	$pattern = '/= twig_compare\(/'; #inline
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_compare(", $content);
+	}
+
+	# twig_call_macro
+	$pattern = '/function twig_call_macro/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_call_macro", $content);
+	}
+	$pattern = '/\'twig_call_macro\(/'; #raw
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_call_macro(", $content);
+	}
+
+	# twig_ensure_traversable
+	$pattern = '/function twig_ensure_traversable/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_ensure_traversable", $content);
+	}
+	$pattern = '/= twig_ensure_traversable\(/'; #inline
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_ensure_traversable(", $content);
+	}
+	
+	# twig_to_array
+	$pattern = '/function twig_to_array/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_to_array", $content);
+	}
+	$pattern = '/\(twig_to_array\(/'; #inline
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "({$prefix}_twig_to_array(", $content);
+	}
+	$pattern = '/,\s+twig_to_array\(/'; #inline
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, ", {$prefix}_twig_to_array(", $content);
+	}
+	$pattern = '/= twig_to_array\(/'; #inline
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "= {$prefix}_twig_to_array(", $content);
+	}
+	$pattern = '/\'twig_to_array\(/'; #raw
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_to_array(", $content);
+	}
+
+	# twig_get_attribute
+	$pattern = '/function twig_get_attribute/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_get_attribute", $content);
+	}
+	$pattern = '/\'twig_get_attribute\(/'; #raw
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_get_attribute(", $content);
+	}
+
+	# twig_check_arrow_in_sandbox
+	$pattern = '/twig_check_arrow_in_sandbox\(/'; #inline
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "{$prefix}_twig_check_arrow_in_sandbox(", $content);
+	}
+	$pattern = '/function twig_check_arrow_in_sandbox/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_check_arrow_in_sandbox", $content);
+	}
+
+	// Prefix 'function JsonSchema'
+	$pattern = '/\'JsonSchema\\\\/'; #inline
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}JsonSchema\\", $content);
+	}
+	
   return $content;
 }
 
