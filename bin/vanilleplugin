@@ -7,9 +7,10 @@
  * @copyright : (c) 2022 Jihad Sinnaour <mail@jihadsinnaour.com>
  * @link      : https://github.com/Jakiboy/VanillePlugin-Packager
  * @license   : MIT
- * @todo      : Add phpunit/phpunit.
- * @todo      : Use symfony/console.
- * @todo      : Use phar.
+ * @todo      : Rebuild with symfony/console
+ * @todo      : Add phpunit/phpunit
+ * @todo      : Use .phar
+ * @todo      : Lexer/Parser
  * 
  * Warning: Use this software at your own risk.
  */
@@ -105,8 +106,8 @@ vanillePluginPackagerDisplayError(0);
  * @return void
  * @uses https://www.php-fig.org/psr/psr-0/
  * @uses https://www.php-fig.org/psr/psr-4/
- * @todo Use dynamic 'vendor' dir.
- * @todo Use dynamic 'system' dir.
+ * @todo Use dynamic vendor directory
+ * @todo Use dynamic system (Plugin) directory
  */
 function vanillePluginPackagerInit(array $options = []) {
 
@@ -237,10 +238,10 @@ function vanillePluginPackagerRegenerate(array $options = []) {
  */
 function vanillePluginPackagerPrefix(string $content, string $dep, string $lib, string $prefix) {
 	if ( $dep === 'vanilleplugin' ) {
-		$content = vanillePluginPackagerPrefixNamespace($content,$prefix);
-		$content = vanillePluginPackagerPrefixFunction($content,$prefix);
-		$content = vanillePluginPackagerPrefixUse($content,$prefix);
-		$content = vanillePluginPackagerPrefixAutoload($content,$prefix);
+		$content = vanillePluginPackagerPrefixNamespace($content,$prefix); #1
+		$content = vanillePluginPackagerPrefixUse($content,$prefix); #2
+		$content = vanillePluginPackagerPrefixAutoload($content,$prefix); #3
+		$content = vanillePluginPackagerPrefixFunction($content,$prefix); #4
 	} else {
 		$content = vanillePluginPackagerPrefixDependencyNamespace($content,$lib,$prefix);
 		$content = vanillePluginPackagerPrefixDependencyUse($content,$lib,$prefix);

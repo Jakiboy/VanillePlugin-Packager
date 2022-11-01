@@ -118,6 +118,7 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 * Use dynamic **vendor** directory.
 * Use dynamic **system** (Plugin) directory.
 * Use **regex(i)** instead of pathinfo().
+* Use **Lexer/Parser**
 
 ## ⭐ Support:
 
@@ -125,4 +126,4 @@ Please give it a Star if you like the project.
 
 ## 💡 Notice:
 
-* *Tested with VanillePlugin & many composer dependencies (e.g. [Twig](https://twig.symfony.com/), [Phpfastcache](https://www.phpfastcache.com/)), But use it at your own risk*.
+* *Tested with VanillePlugin & many composer dependencies (e.g. [Twig](https://twig.symfony.com/)), But use it at your own risk*.
