@@ -503,6 +503,10 @@ function vanillePluginPackagerPrefixFunction(string $content, string $prefix) {
 	if ( (bool)preg_match($pattern,$content) ) {
 		$content = preg_replace($pattern, "= {$prefix}_twig_test_empty(", $content);
 	}
+		$pattern = '/\(twig_test_empty\(/'; #inline
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "({$prefix}_twig_test_empty(", $content);
+	}
 
 	# twig_test_iterable
 	$pattern = '/function twig_test_iterable/';
@@ -797,6 +801,10 @@ function vanillePluginPackagerPrefixFunction(string $content, string $prefix) {
 	if ( (bool)preg_match($pattern,$content) ) {
 		$content = preg_replace($pattern, "= {$prefix}_twig_array_merge(", $content);
 	}
+	$pattern = '/\'twig_array_merge\(/'; #raw
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_array_merge(", $content);
+	}
 	
 	# twig_array_batch
 	$pattern = '/function twig_array_batch/';
@@ -1040,6 +1048,46 @@ function vanillePluginPackagerPrefixFunction(string $content, string $prefix) {
 	$pattern = '/\'twig_get_attribute\(/'; #raw
 	if ( (bool)preg_match($pattern,$content) ) {
 		$content = preg_replace($pattern, "'{$prefix}_twig_get_attribute(", $content);
+	}
+
+	# twig_var_dump
+	$pattern = '/function twig_var_dump/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_var_dump", $content);
+	}
+	$pattern = '/\'twig_var_dump\'/'; #raw
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_var_dump'", $content);
+	}
+
+	# twig_escape_filter_is_safe
+	$pattern = '/function twig_escape_filter_is_safe/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_escape_filter_is_safe", $content);
+	}
+	$pattern = '/\'twig_escape_filter_is_safe\'/'; #raw
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_escape_filter_is_safe'", $content);
+	}
+
+	# twig_escape_filter
+	$pattern = '/function twig_escape_filter/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_escape_filter", $content);
+	}
+	$pattern = '/\'twig_escape_filter\'/'; #raw
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_escape_filter'", $content);
+	}
+	
+	# twig_raw_filter
+	$pattern = '/function twig_raw_filter/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "function {$prefix}_twig_raw_filter", $content);
+	}
+	$pattern = '/\'twig_raw_filter\'/'; #raw
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}_twig_raw_filter'", $content);
 	}
 
 	# twig_check_arrow_in_sandbox
