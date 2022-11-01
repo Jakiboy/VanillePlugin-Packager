@@ -523,7 +523,7 @@ function vanillePluginPackagerPrefixFunction(string $content, string $prefix) {
 	}
 	$pattern = '/\!twig_test_iterable\(/'; #raw
 	if ( (bool)preg_match($pattern,$content) ) {
-		$content = preg_replace($pattern, "'!{$prefix}_twig_test_iterable('", $content);
+		$content = preg_replace($pattern, "!{$prefix}_twig_test_iterable(", $content);
 	}
 	
 	# twig_date_format_filter
