@@ -3,7 +3,7 @@
 /**
  * @author    : JIHAD SINNAOUR
  * @package   : VanillePlugin Packager
- * @version   : 0.3.1
+ * @version   : 0.3.2
  * @copyright : (c) 2022 Jihad Sinnaour <mail@jihadsinnaour.com>
  * @link      : https://github.com/Jakiboy/VanillePlugin-Packager
  * @license   : MIT
@@ -31,7 +31,7 @@ if ( (php_sapi_name() !== 'cli')
 define('PACKAGER_NAME','VanillePlugin Packager');
 define('PACKAGER_DESC','Composer Namespaces Prefixer for WordPress Plugins');
 define('PACKAGER_SYNOPSIS','Resolve dependencies versions conflicts of WordPress plugins built using Composer.');
-define('PACKAGER_VERSION','0.3.1');
+define('PACKAGER_VERSION','0.3.2');
 define('PACKAGER_AUTHOR','Jihad Sinnaour');
 define('PACKAGER_LINK','https://jakiboy.github.io/VanillePlugin-Packager/');
 
@@ -309,6 +309,12 @@ function vanillePluginPackagerPrefixUse(string $content, string $prefix) {
 	$pattern = '/(?!(?i)use\s+VanillePluginConfig)(?i)use\s+VanillePlugin/';
 	if ( (bool)preg_match($pattern,$content) ) {
 		$content = preg_replace($pattern, "use {$prefix}VanillePlugin", $content);
+	}
+
+	// Prefix inline 'VanillePlugin'
+	$pattern = '/\'VanillePlugin/';
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}VanillePlugin", $content);
 	}
 
 	// Prefix 'use VanilleCache'
