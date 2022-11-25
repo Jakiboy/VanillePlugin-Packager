@@ -311,12 +311,6 @@ function vanillePluginPackagerPrefixUse(string $content, string $prefix) {
 		$content = preg_replace($pattern, "use {$prefix}VanillePlugin", $content);
 	}
 
-	// Prefix inline 'VanillePlugin'
-	$pattern = '/\'VanillePlugin/';
-	if ( (bool)preg_match($pattern,$content) ) {
-		$content = preg_replace($pattern, "'{$prefix}VanillePlugin", $content);
-	}
-
 	// Prefix 'use VanilleCache'
 	$pattern = '/(?!(?i)use\s+VanillePluginConfig)(?i)use\s+VanilleCache/';
 	if ( (bool)preg_match($pattern,$content) ) {
