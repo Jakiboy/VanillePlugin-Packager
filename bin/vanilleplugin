@@ -1109,6 +1109,12 @@ function vanillePluginPackagerPrefixFunction(string $content, string $prefix) {
 	if ( (bool)preg_match($pattern,$content) ) {
 		$content = preg_replace($pattern, "'{$prefix}JsonSchema\\", $content);
 	}
+
+	// Prefix 'function VanillePlugin'
+	$pattern = '/\'VanillePlugin\\\\/'; #inline
+	if ( (bool)preg_match($pattern,$content) ) {
+		$content = preg_replace($pattern, "'{$prefix}VanillePlugin\\", $content);
+	}
 	
   return $content;
 }
