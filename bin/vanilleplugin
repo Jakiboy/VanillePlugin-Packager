@@ -1,10 +1,10 @@
 #!/usr/bin/env php
 <?php
 /**
- * @author    : JIHAD SINNAOUR
+ * @author    : Jihad Sinnaour
  * @package   : VanillePlugin Packager
- * @version   : 0.3.2
- * @copyright : (c) 2022 Jihad Sinnaour <mail@jihadsinnaour.com>
+ * @version   : 0.3.3
+ * @copyright : (c) 2023 Jihad Sinnaour <mail@jihadsinnaour.com>
  * @link      : https://github.com/Jakiboy/VanillePlugin-Packager
  * @license   : MIT
  * @todo      : Rebuild with symfony/console
@@ -26,12 +26,12 @@ ini_set('memory_limit','256M');
  * Check PHP SAPI & Version.
  */
 if ( (php_sapi_name() !== 'cli') 
-  || (PHP_VERSION_ID < 70200) ) exit();
+  || (PHP_VERSION_ID < 80204) ) exit();
 
 define('PACKAGER_NAME','VanillePlugin Packager');
 define('PACKAGER_DESC','Composer Namespaces Prefixer for WordPress Plugins');
 define('PACKAGER_SYNOPSIS','Resolve dependencies versions conflicts of WordPress plugins built using Composer.');
-define('PACKAGER_VERSION','0.3.2');
+define('PACKAGER_VERSION','0.3.3');
 define('PACKAGER_AUTHOR','Jihad Sinnaour');
 define('PACKAGER_LINK','https://jakiboy.github.io/VanillePlugin-Packager/');
 
